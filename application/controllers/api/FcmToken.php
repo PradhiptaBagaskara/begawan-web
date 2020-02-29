@@ -5,13 +5,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH . '/libraries/REST_Controller.php';
 use Restserver\Libraries\REST_Controller;
 
-class Saldo extends REST_Controller {
+class FcmToken extends REST_Controller {
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->model('M_userApi', 'userApi');
-		$this->load->model('M_api', 'api');
 		$this->load->model('M_api2', 'api2');
+		$this->load->model('M_api', 'api');
 
 	}
 
@@ -27,10 +27,34 @@ class Saldo extends REST_Controller {
 						"msg" => "user tidak ditemukan",
 							"result" => null);
 			if ($cek > 0) {
-				$saldo = $this->api2->get("user",['id' => $auth]);
+				$id = $this->get("id");
+
+
+				if (!empty($id)) {
+				$this->db->select('ifnull(sum(transaksi.dana), "0") as total_dana, proyek.modal - ifnull(sum(transaksi.dana),"0") as sisa_modal ,proyek.id,proyek.nama_proyek,ifnull(proyek.keterangan, "Tidak Ada Catatan") as keterangan,proyek.modal, DATE_FORMAT(proyek.created_date, "%a, %d %M %Y") as created_date');
+				$this->db->from('proyek');
+				$this->db->join('transaksi', 'transaksi.id_proyek = proyek.id', 'left');
+				$this->db->where('proyek.id', $id);
+				$this->db->order_by('created_date', 'desc');
+				$proyek = $this->db->get()->result();
+
+				$tx = $this->api2->getTx(['id_proyek' => $id]);
+					
+				}else{
+
+				$proyek=$this->db->get('proyek')->result();
+
+
+				$tx = null;		
+
+				
+				}
+
 				$res = array("status" => true,
 							"msg" => "success",
-								"result" => array('saldo' => $saldo->saldo));
+							"transaksi" => $tx,
+								"result" => $proyek);
+				
 			}
 			
 		}
@@ -41,48 +65,26 @@ class Saldo extends REST_Controller {
 	public function index_post()
 	{
 		$auth = $this->post('auth_key');
-		$id = $this->post('id');
-		$postSaldo = $this->post('saldo');
+		$token = $this->post('token');
+	
 		$res = array("status" => false,
 						"msg" => "Terjadi Kesalahan!",
 							"result" => null);
-		$param = $this->post('param');
-		if (!empty($auth) && !empty($param)) {
+		if (!empty($auth)) {
 
 
-			$cek = $this->api->cek_field("id", $id, "user");
+			$cek = $this->api->cek_field("id", $auth, "user");
 			$res = array("status" => false,
 						"msg" => "user tidak ditemukan",
 							"result" => null);
+
 			if ($cek > 0) {
-
-				$saldoParr = $this->api2->get("user",['id' => $id])->saldo;
-
-
-				if ($param == "tambah") {
-						$saldo = $saldoParr;
-
-					if ($postSaldo != "0" && $postSaldo != "") {
-						$saldo = $saldoParr + $postSaldo;
-							# code...
-						$this->api2->insert("khas_history", ["id_user" => $id, "id_pemodal" => $auth,
-										"saldo_awal" => $saldoParr, "saldo_masuk" => $postSaldo, "saldo_total" => $saldo,
-										"keterangan" => "Menambahkan Saldo"]);			
-
-					}
-
-					# code...
-				} elseif ($param == "kurang") {
-					$saldo = $saldoParr - $postSaldo;
-
-					# code...
-				}
-				$saldo = $this->api2->update("user", ["saldo" => $saldo], ['id' => $id]);
-
+				$this->api2->update("user", ["device_token" => $token], ["id"=>$auth]);
 				$res = array("status" => true,
-							"msg" => "saldo update success",
-								"result" => null);
+						"msg" => "token update",
+							"result" => null);
 			}
+
 			
 		}
 		$this->response($res);
