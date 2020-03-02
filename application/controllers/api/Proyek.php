@@ -98,10 +98,16 @@ class Proyek extends REST_Controller {
 					$data = array("nama_proyek" => $nama_proyek, "modal" => $modal,"keterangan" => $keterangan);
 
 					if ($par == "insert") {
-						$this->api2->insert("proyek", $data);		
-						$res = array("status" => true,
-								"msg" => "proyek insert success",
-									"result" => array());
+						$insert = $this->api2->insert("proyek", $data);
+						if ($insert) {
+							$this->db->where('id', $insert);
+							$ress = $this->db->get('proyek')->result();
+							$res = array("status" => true,
+								"msg" => "proyek telah ditambahkan",
+									"result" => array_shift($ress));
+						}
+
+					
 					}elseif ($par == "update") {
 						$id = $this->post("id");
 						$this->api2->update("proyek", $data, ["id" => $id]);

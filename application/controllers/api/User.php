@@ -52,30 +52,50 @@ use Restserver\Libraries\REST_Controller;
  	}
  	public function index_post()
  	{
+
  		$response = array('status' => false,
  								'msg' => 'authenticate required!',
  								'result' => null);
- 		$role = $this->api->cek_role($this->post('auth_key'));
- 		if (empty($role)) {
- 			$role = 0;
+ 		$auth = $this->post('auth_key');
+ 		$nama = $this->post('nama');
+ 		$password = $this->post('password');
+ 		if (!empty($auth)) {
+ 		$role = $this->api->cek_role($auth);
+
+	 		if ($role > 0) {
+	 			$uname =  $this->api->get_username($this->post('nama'));
+	 			$arrayName = array('id' => $this->api->gen_uuid(),
+	 								'nama' => $this->post('nama'),
+	 								'saldo' => $this->post('saldo'),
+	 								'username' => $uname,
+	 								'password' => $this->api->password('123456'),
+	 								'foto' => 'thumbnail.png',
+	 								'role' => $this->post('role') );
+	 			$this->userApi->insert($arrayName);
+	 			$this->db->where('username', $uname);
+						$result = $this->db->get("user")->result();
+	 					$res = array_shift($result);
+							
+
+	 			$response = array('status' => true,
+	 								'msg' => 'success', 
+	 								'result' => $res);
+	 		 }elseif ($role == 0) {
+	 		 	$pass = $this->api->password($password);
+	 		 	$this->api2->update("user", ["nama" => $nama, "password" => $pass], ["id", $auth]);
+	 		 	$this->db->where('id', $$auth);
+ 		 		$result = $this->db->get("user")->result();
+ 				$res = array_shift($result);
+							
+
+	 			$response = array('status' => true,
+	 								'msg' => 'success', 
+	 								'result' => $res);
+	 		 	# code...
+	 		 }
+
  		}
 
- 		if ($role > 0) {
- 			$uname =  $this->api->get_username($this->post('nama'));
- 			$arrayName = array('id' => $this->api->gen_uuid(),
- 								'nama' => $this->post('nama'),
- 								'saldo' => $this->post('saldo'),
- 								'username' => $uname,
- 								'password' => $this->api->password('123456'),
- 								'foto' => 'thumbnail.png',
- 								'role' => $this->post('role') );
- 			$this->userApi->insert($arrayName);
-
- 			$response = array('status' => true,
- 								'msg' => 'success', 
- 								'result' => array('username' => $uname,
- 													'password' => '123456' ));
- 		}
  		$this->response($response);
 
  		# code...

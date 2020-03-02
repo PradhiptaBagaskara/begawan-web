@@ -61,6 +61,8 @@ class EditPemilik extends REST_Controller {
 						
 					}
 				
+					$this->db->select('nama,username,ifnull(device_token,"abcd") as device_token, created_date,role,id,foto,is_active,nomer,is_active');
+
 					$this->db->where('id', $auth);
 					$result = $this->db->get("user")->result();
  					$res = array_shift($result);

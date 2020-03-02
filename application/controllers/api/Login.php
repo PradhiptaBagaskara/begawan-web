@@ -33,7 +33,6 @@ use Restserver\Libraries\REST_Controller;
  		if ($uname == "1" ) {
 
  			$var =  $this->api->cek_pass('username', $username, $password);
- 			$this->userApi->update(['device_token' => $device], ['username' => $username]);
 
  			if ($var) {
  				$this->db->where('username', $username);

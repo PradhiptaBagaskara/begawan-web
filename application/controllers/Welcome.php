@@ -18,9 +18,23 @@ $this->load->model('M_userApi', 'userApi');
 		// $t = explode(" ", "ahmad saphi i");
 		// var_dump($t);
 		// echo $this->api->cek_role("a48524be21c94d52b1338dd01b73b08a");
-		$this->db->select('sum(dana)');
-		$this->db->from('transaksi');
-		var_dump($this->db->get()->row_array());
+		// $this->db->select('last_insert_id()');
+		// $this->db->from('user');
+		// $this->db->where('id', "LAST_INSERT_ID()");
+		// $token = $this->db->get()->result();
+		$today = date("Y-m-d");
+		$token = $this->db->query("select * from transaksi where created_date like '$today'")->result();
+		// $token = $this->api2->getAll("transaksi", ["id" => "32e927bed2384fca88fd86458c2a9e30", 
+		// 	'month(created_date)=' => $today]);
+		// $token ="e3gT6ll4bYE:APA91bFf3LqQctzs4THGjxzNPIePhmxdXjUOysrSZCZS8TZJ70SSIu6XMNb8V7wOJfaR34VgY-_kI4HIzBbKcy37taLL0hBK5KOpy3rSIQcPnM8py0crUYhXnMVodrmbW0zGi5hYcKN1";
+		// $token = "topics/Gaji";
+		// $this->api->sendNotif("222", $token, "titel", "9000",2);
+		// echo $token;
+		// $this->db->select('nama,username,ifnull(device_token,"abcd") as device_token, created_date,role,id,foto,is_active,nomer,is_active');
+		// 			$this->db->where('username','bon321');
+		// 			$result = $this->db->get("user")->result();
+		// var_dump($token);
+		echo json_encode($token);
 
 		// $pass = $this->api->password("password");
 		

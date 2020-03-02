@@ -67,7 +67,12 @@ class Saldo extends REST_Controller {
 							# code...
 						$this->api2->insert("khas_history", ["id_user" => $id, "id_pemodal" => $auth,
 										"saldo_awal" => $saldoParr, "saldo_masuk" => $postSaldo, "saldo_total" => $saldo,
-										"keterangan" => "Menambahkan Saldo"]);			
+										"keterangan" => "Menambahkan Saldo"]);
+						$rupiah = $this->api->rupiah($postSaldo);
+						$this->db->select('device_token, nama');
+						$this->db->where('id', $id);
+						$dt = $this->db->get('user');
+						$noti = $this->api->sendNotif($id,$dt->row("device_token"), "Hi ".$dt->row('nama') ,"Saldo Khas Telah Di Tambahkan Senilai ". $rupiah,'0');			
 
 					}
 
@@ -80,7 +85,7 @@ class Saldo extends REST_Controller {
 				$saldo = $this->api2->update("user", ["saldo" => $saldo], ['id' => $id]);
 
 				$res = array("status" => true,
-							"msg" => "saldo update success",
+							"msg" => "update saldo success",
 								"result" => null);
 			}
 			

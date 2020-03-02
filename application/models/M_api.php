@@ -3,15 +3,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_api extends CI_Model {
 
+	function rupiah($angka){
+	
+	$hasil_rupiah = "Rp " . number_format($angka,2,',','.');
+	return $hasil_rupiah;
+ 
+}
 
-	function sendNotif($title, $body){
+
+	function sendNotif($id, $token,$title, $body,$halaman){
 		$url = "https://fcm.googleapis.com/fcm/send";
-	    $token = "/topics/news";
-	    $serverKey = 'AAAAdKCLzws:APA91bGgztT3sTgMdwfZKE47XaHqzyxTNBUE61Wmg5EvQmIwqk9TTs5eamSnkXZu43D2BOKe6EeGkgnDRefQJHlpTq8fa_o7x8GlRkQLX_U9KWm5W8QH-U0Hq6khpGUPw9lixZb4BEXc';
+	    $token = $token;
+	    $serverKey = 'AAAAjVYZDqE:APA91bGcCTrevxdsrr6z21lGuMKXH2ka3SyhxMFnZiP-v13nrRguVL0yZBio5LXXxM8dYPMQfuOiPetjKtHcuXqRBCgZPBmpLHcZda80Fod89FgIYr8jQhofhuhGcEzZQBcfhPEi5VE7';
 	    // $title = "Notification title";
 	    // $body = "Hello I am from Your php server";
-	    $notification = array('title' =>$title , 'body' => $body);
-	    $arrayToSend = array('to' => $token, 'notification' => $notification);
+	    $notification = array("sound" => "default", 'android_channel_id' => 'com.pt.begawanpolosoro');
+	    $data = array("id_user" => $id, 'title' =>$title , 'message' => $body, "halaman" => $halaman);
+	    $arrayToSend = array('to' => $token,'data' => $data);
 	    $json = json_encode($arrayToSend);
 	    $headers = array();
 	    $headers[] = 'Content-Type: application/json';
@@ -21,16 +29,21 @@ class M_api extends CI_Model {
 	    curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
 	    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
 	    curl_setopt($ch, CURLOPT_HTTPHEADER,$headers);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
+
 	    //Send the request
 	    $response = curl_exec($ch);
 	    //Close request
-	    // if ($response === FALSE) {
-	    // die('FCM Send Error: ' . curl_error($ch));
-	    // }
+	    if ($response === FALSE) {
+	    die('FCM Send Error: ' . curl_error($ch));
+	    }else{
+	    	return "ss";
+	    }
 	    curl_close($ch);
-	    return '<meta http-equiv="refresh"
-   content="0; url='.base_url().'">';;
-
+	    return;
+	  //   return '<meta http-equiv="refresh"
+   // content="0; url='.base_url().'">';
+#126AAF
 	}
 
 
@@ -63,8 +76,8 @@ class M_api extends CI_Model {
 	function get_username($value)
 	{
 		$t = explode(" ", $value);
-		$ran = rand(1,99);
-		return $t[0].$ran;
+		$ran = rand(10,99);
+		return strtolower($t[0]).$ran;
 		# code...
 	}
 

