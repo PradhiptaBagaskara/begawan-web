@@ -66,11 +66,13 @@ class Transaksi extends REST_Controller {
 						"msg" => "user tidak ditemukan",
 							"result" => null);
 			if ($cek > 0) {
-
-				$saldoParr = $this->userApi->get(['id' => $auth])->saldo;
-
-				$saldo =  $saldoParr - $dana;
+				if ($jenis =="khas") {
+				$saldoParr = $this->userApi->get(['id' => $auth]);
+				$sal = array_shift($saldoParr);
+				$saldo =  $sal->saldo - $dana;
 				$this->api2->update("user", ["saldo" => $saldo], ["id" => $auth]);
+				}
+				
 
 				$data = array("id_user" => $auth, 
 								"id_proyek" => $id_proyek,
@@ -81,11 +83,10 @@ class Transaksi extends REST_Controller {
 
 
 				$this->api2->insert("transaksi", $data);
-				$saldo = $this->userApi->update(["saldo" => $saldo], ['id' => $auth]);			
 
 				$res = array("status" => true,
-							"msg" => "transaksi insert success",
-								"result" => array());
+							"msg" => "Transaksi Baru Telah Di Tambahkan",
+								"result" => null);
 			}
 			
 		}

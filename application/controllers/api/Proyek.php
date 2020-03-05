@@ -26,12 +26,28 @@ class Proyek extends REST_Controller {
 			$res = array("status" => false,
 						"msg" => "user tidak ditemukan",
 							"result" => null);
+
+
 			if ($cek > 0) {
+				$role = $this->api->cek_role($auth);
+
+				if ($role < 1) {
+				$this->db->select('nama_proyek,id');
+				$this->db->from('proyek');
+				$data = $this->db->get()->result();
+				$res = array("status" => true,
+						"msg" => "list proyek",
+							"result" => $data);
+			}else{
+
+
 				$id = $this->get("id");
 
 
 				if (!empty($id)) {
-				$this->db->select('ifnull(sum(transaksi.dana), "0") as total_dana, proyek.modal - ifnull(sum(transaksi.dana),"0") as sisa_modal ,proyek.id,proyek.nama_proyek,ifnull(proyek.keterangan, "Tidak Ada Catatan") as keterangan,proyek.modal, DATE_FORMAT(proyek.created_date, "%a, %d %M %Y") as created_date');
+					$this->db->query("SET lc_time_names = 'id_ID'");					
+
+				$this->db->select('ifnull(sum(transaksi.dana), "0") as total_dana, proyek.modal - ifnull(sum(transaksi.dana),"0") as sisa_modal ,proyek.id,proyek.nama_proyek,ifnull(proyek.keterangan, "Tidak Ada Catatan") as keterangan,proyek.modal, DATE_FORMAT(proyek.created_date, "%d %M %Y") as created_date');
 				$this->db->from('proyek');
 				$this->db->join('transaksi', 'transaksi.id_proyek = proyek.id', 'left');
 				$this->db->where('proyek.id', $id);
@@ -41,6 +57,9 @@ class Proyek extends REST_Controller {
 				$tx = $this->api2->getTx(['id_proyek' => $id]);
 					
 				}else{
+					$this->db->query("SET lc_time_names = 'id_ID'");					
+					
+					$this->db->select('nama_proyek, id, DATE_FORMAT(proyek.created_date, "%d %M %Y") as created_date');
 
 				$proyek=$this->db->get('proyek')->result();
 
@@ -54,6 +73,8 @@ class Proyek extends REST_Controller {
 							"msg" => "success",
 							"transaksi" => $tx,
 								"result" => $proyek);
+				
+				}
 				
 			}
 			
@@ -124,6 +145,41 @@ class Proyek extends REST_Controller {
 			
 		}
 		$this->response($res);
+	}
+
+	public function index_put()
+	{
+		$id = $this->put("id");
+		$auth = $this->put("auth_key");
+
+		$res = array("status" => false,
+						"msg" => "Terjadi Kesalahan!",
+							"result" => null);
+		if (!empty($auth)) {
+
+
+			$cek = $this->api->cek_field("id", $auth, "user");
+			$res = array("status" => false,
+						"msg" => "user tidak ditemukan",
+							"result" => null);
+
+			if ($cek > 0) {
+				$cek_role = $this->api->cek_role($auth);
+				$res = array("status" => false,
+						"msg" => "user tidak diijinkan",
+							"result" => null);
+				if ($cek_role == 2) {
+					$this->api2->delete("proyek", ["id" => $id]);
+					$this->api2->delete("transaksi", ["id_proyek" => $id]);
+					$res = array("status" => true,
+						"msg" => "Data Berhasil Dihapus",
+							"result" => null);
+				}
+			}
+		}
+		$this->response($res);
+
+		# code...
 	}
 
 }

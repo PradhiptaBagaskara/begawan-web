@@ -60,7 +60,7 @@ use Restserver\Libraries\REST_Controller;
  		if ($uname > 0 ) {
  			$role = $this->api->cek_role($auth);
 
- 			if ( $role > 1) {
+ 			// if ( $role > 1) {
  				$password = $this->api->password($pass);
 
 	 			$var =  $this->api2->update('user', ["password"=>$password], ["id"=>$id]);
@@ -76,7 +76,7 @@ use Restserver\Libraries\REST_Controller;
 			 											"msg" => "tidak diizinkan!",
 			 			 								"result" => null));
 	 			}
- 			}
+ 			// }
 		 	
  		}else{
  			$this->response(array("status" => false,

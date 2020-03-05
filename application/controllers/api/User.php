@@ -32,7 +32,7 @@ use Restserver\Libraries\REST_Controller;
 							"result" => null);
 				$cek_level = $this->api->cek_role($auth);
 				if ($cek_level == 2 ) {
-					$data = $this->userApi->get(["role !=" => 2]);
+					$data = $this->userApi->get(["role"=>0]);
 					$res = array("status" => true,
 						"msg" => "success",
 							"result" => $data);
@@ -62,7 +62,7 @@ use Restserver\Libraries\REST_Controller;
  		if (!empty($auth)) {
  		$role = $this->api->cek_role($auth);
 
-	 		if ($role > 0) {
+	 		if ($role == 2) {
 	 			$uname =  $this->api->get_username($this->post('nama'));
 	 			$arrayName = array('id' => $this->api->gen_uuid(),
 	 								'nama' => $this->post('nama'),
@@ -71,25 +71,41 @@ use Restserver\Libraries\REST_Controller;
 	 								'password' => $this->api->password('123456'),
 	 								'foto' => 'thumbnail.png',
 	 								'role' => $this->post('role') );
-	 			$this->userApi->insert($arrayName);
+	 			$uid  = $this->userApi->insert($arrayName);
 	 			$this->db->where('username', $uname);
-						$result = $this->db->get("user")->result();
-	 					$res = array_shift($result);
+				$result = $this->db->get("user")->result();
+				$res = array_shift($result);
+				$this->db->insert("khas_history", ["id_user" => $res->id, 
+										"id_pemodal" => $auth,
+										"saldo_awal" => "0", 
+										"saldo_masuk" => $res->saldo, 
+										"saldo_total" => $res->saldo,
+										"keterangan" => "Menambahkan Saldo"]);
 							
 
 	 			$response = array('status' => true,
-	 								'msg' => 'success', 
+	 								'msg' => 'success',
 	 								'result' => $res);
-	 		 }elseif ($role == 0) {
-	 		 	$pass = $this->api->password($password);
-	 		 	$this->api2->update("user", ["nama" => $nama, "password" => $pass], ["id", $auth]);
-	 		 	$this->db->where('id', $$auth);
- 		 		$result = $this->db->get("user")->result();
+	 		 }else{
+	 		 	if ($password != "") {
+	 		 		$pass = $this->api->password($password);
+	 		 		$this->api2->update("user", ["nama" => $nama, "password" => $pass], ["id" => $auth]);
+	 		 		$su = "Nama dan Password Telah Terganti";
+
+	 		 	}else{
+	 		 		$this->api2->update("user", ["nama" => $nama], ["id" => $auth]);
+	 		 		$su = "Nama Telah Terganti";
+	 		 	}
+	 		 	
+	 		 	$this->db->select('*');
+	 		 	$this->db->from('user');
+	 		 	$this->db->where('id', $auth);
+ 		 		$result = $this->db->get()->result();
  				$res = array_shift($result);
 							
 
 	 			$response = array('status' => true,
-	 								'msg' => 'success', 
+	 								'msg' => $su, 
 	 								'result' => $res);
 	 		 	# code...
 	 		 }

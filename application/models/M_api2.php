@@ -47,6 +47,7 @@ class M_api2 extends CI_Model {
 
     public function getTx($where = NULL, $index = NULL)
     {
+        $this->db->query("SET lc_time_names = 'id_ID'");                      
         $this->db->select('user.nama, user.role role, user.saldo, transaksi.dana, DATE_FORMAT(transaksi.created_date, "%d %M %Y") as created_date, transaksi.jenis, transaksi.nama_transaksi, transaksi.keterangan, transaksi.id, proyek.nama_proyek');
         $this->db->from('transaksi');
         $this->db->join('user', 'transaksi.id_user = user.id', 'left');
