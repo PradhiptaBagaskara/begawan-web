@@ -68,6 +68,12 @@ class Getpdf extends REST_Controller {
 				$res = array("status" => false,
 						"msg" => "permintaan laporan tidak ditemukan",
 							"result" => null);
+				$del = $this->api2->getAll("pdf");
+				foreach ($del as $key) {
+					# code...
+					@unlink($key->file_name);
+					$this->api2->delete("pdf", ["id" => $key->id]);
+				}
 				if ($param == "proyek") {
 					$cek_lap = $this->api->cek_field('id',$id,'proyek');
 					if ($cek_lap > 0) {
