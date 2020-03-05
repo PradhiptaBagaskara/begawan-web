@@ -1,6 +1,5 @@
 .DS_Store
 vendor
 .idea
-uploads/
-android/
-andro-file/
+
+*.pdf
