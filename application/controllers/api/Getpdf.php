@@ -24,20 +24,29 @@ class Getpdf extends REST_Controller {
 						"msg" => "Terjadi Kesalahan!",
 							"result" => null);
 		if (!empty($auth)) {
-			$cek = $this->api->cek_field("id", $auth, "user");
 			$res = array("status" => false,
-						"msg" => "user tidak diijinkan",
+						"msg" => "Tidak ditemukan",
 							"result" => null);
-			$cek_role = $this->api->cek_role($auth);
-			if ($cek_role  == 2) {
-				if ($limit != '') {
-					$this->db->limit($limit);
+			$cek = $this->api->cek_field("id", $auth, "user");
+			if ($cek > 0) {
+				$res = array("status" => false,
+						"msg" => "Tidak diijinkan",
+							"result" => null);
+				$cek_level = $this->api->cek_role($auth);
+				if ($cek_level == 2 ) {
+					$data = $this->userApi->get();
+					$res = array("status" => true,
+						"msg" => "success",
+							"result" => $data);
+				}elseif ($cek_level == 1) {
+					$this->db->where('role', 0);
+						$data =$this->db->get('user')->result();
+					$res = array("status" => true,
+						"msg" => "success pemodal",
+							"result" => $data);
 				}
-				$saldo = $this->api2->get("pdf");
-				$res = array("status" => true,
-							"msg" => "success",
-								"result" => $saldo);
 			}
+			
 			
 		}
 		$this->response($res);

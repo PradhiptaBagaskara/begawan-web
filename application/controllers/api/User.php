@@ -81,6 +81,11 @@ use Restserver\Libraries\REST_Controller;
 										"saldo_masuk" => $res->saldo, 
 										"saldo_total" => $res->saldo,
 										"keterangan" => "Menambahkan Saldo"]);
+
+				$pengirim = $this->api2->get("user",['id' => $auth])->saldo;
+				$pengirimDana = $pengirim-$res->saldo;
+				$this->api2->update("user", ["saldo" => $pengirimDana], ["id"=>$auth]);						
+
 							
 
 	 			$response = array('status' => true,

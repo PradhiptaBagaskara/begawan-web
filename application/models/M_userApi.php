@@ -44,7 +44,7 @@ class M_userApi extends CI_Model {
                 return $result;
             }
         } else {
-            return false;
+            return NULL;
         }
     }
 

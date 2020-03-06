@@ -272,7 +272,7 @@ class M_pdf extends CI_Model {
 			khas_history.created_date as created_date, 
 			user.username, 
 			user.nama, 
-			if(khas_history.id_pemodal = user.id, 'Tidak Diketahui',(select nama from user where id='".$p."')) as nama_pengirim");
+			if(khas_history.id_pemodal = user.id, (select nama from user where id='".$p."'),(select nama from user where id='".$p."')) as nama_pengirim");
 		$this->db->from('khas_history');
 		$this->db->join('user', 'khas_history.id_user = user.id', 'left');
 		$this->db->where('khas_history.id_user', $id);

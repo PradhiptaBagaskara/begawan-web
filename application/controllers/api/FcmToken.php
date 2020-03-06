@@ -17,47 +17,11 @@ class FcmToken extends REST_Controller {
 
 	public function index_get()
 	{
-		$auth = $this->get('auth_key');
 		$res = array("status" => false,
 						"msg" => "Terjadi Kesalahan!",
-							"result" => null);
-		if (!empty($auth)) {
-			$cek = $this->api->cek_field("id", $auth, "user");
-			$res = array("status" => false,
-						"msg" => "user tidak ditemukan",
-							"result" => null);
-			if ($cek > 0) {
-				$id = $this->get("id");
-
-
-				if (!empty($id)) {
-				$this->db->select('ifnull(sum(transaksi.dana), "0") as total_dana, proyek.modal - ifnull(sum(transaksi.dana),"0") as sisa_modal ,proyek.id,proyek.nama_proyek,ifnull(proyek.keterangan, "Tidak Ada Catatan") as keterangan,proyek.modal, DATE_FORMAT(proyek.created_date, "%a, %d %M %Y") as created_date');
-				$this->db->from('proyek');
-				$this->db->join('transaksi', 'transaksi.id_proyek = proyek.id', 'left');
-				$this->db->where('proyek.id', $id);
-				$this->db->order_by('created_date', 'desc');
-				$proyek = $this->db->get()->result();
-
-				$tx = $this->api2->getTx(['id_proyek' => $id]);
-					
-				}else{
-
-				$proyek=$this->db->get('proyek')->result();
-
-
-				$tx = null;		
-
-				
-				}
-
-				$res = array("status" => true,
-							"msg" => "success",
-							"transaksi" => $tx,
-								"result" => $proyek);
-				
-			}
+							"result" => null);	
 			
-		}
+		
 		$this->response($res);
 		
 	}

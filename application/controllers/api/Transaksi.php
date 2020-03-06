@@ -72,6 +72,9 @@ class Transaksi extends REST_Controller {
 				$saldo =  $sal->saldo - $dana;
 				$this->api2->update("user", ["saldo" => $saldo], ["id" => $auth]);
 				}
+				if ($keterangan == "") {
+					$keterangan = "Tidak Ada Catatan";
+				}
 				
 
 				$data = array("id_user" => $auth, 

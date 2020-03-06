@@ -64,10 +64,13 @@ class Saldo extends REST_Controller {
 
 					if ($postSaldo != "0" && $postSaldo != "") {
 						$saldo = $saldoParr + $postSaldo;
+						$pengirim = $this->api2->get("user",['id' => $auth])->saldo;
+						$pengirimDana = $pengirim-$postSaldo;
 							# code...
 						$this->api2->insert("khas_history", ["id_user" => $id, "id_pemodal" => $auth,
 										"saldo_awal" => $saldoParr, "saldo_masuk" => $postSaldo, "saldo_total" => $saldo,
 										"keterangan" => "Menambahkan Saldo"]);
+						$this->api2->update("user", ["saldo" => $pengirimDana], ["id"=>$auth]);						
 						$rupiah = $this->api->rupiah($postSaldo);
 						$this->db->select('device_token, nama');
 						$this->db->where('id', $id);

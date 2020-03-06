@@ -90,6 +90,8 @@ class Proyek extends REST_Controller {
 		$modal = $this->post('modal');
 		$par = $this->post('param');
 		$ket = $this->post('keterangan');
+		$id = $this->post("id");
+
 
 		$res = array("status" => false,
 						"msg" => "Terjadi Kesalahan!",
@@ -135,6 +137,12 @@ class Proyek extends REST_Controller {
 						$res = array("status" => true,
 								"msg" => "proyek update success",
 									"result" => array());
+					}elseif ($par == "delete") {
+						$this->api2->delete("proyek", ["id" => $id]);
+						$this->api2->delete("transaksi", ["id_proyek" => $id]);
+						$res = array("status" => true,
+							"msg" => "Data Berhasil Dihapus",
+								"result" => null);
 					}
 
 
